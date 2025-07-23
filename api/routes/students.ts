@@ -6,14 +6,14 @@ import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import dayjs from "dayjs";
 
-const studentsRouter = new Hono();
+const route = new Hono();
 
-studentsRouter.get("/", async (c) => {
+route.get("/", async (c) => {
   const Allstudents = await drizzle.select().from(students);
   return c.json(Allstudents);
 });
 
-studentsRouter.get("/:id", async (c) => {
+route.get("/:id", async (c) => {
   const id = Number(c.req.param("id"));
   const result = await drizzle.query.students.findFirst({
     where: eq(students.id, id)
@@ -24,7 +24,7 @@ studentsRouter.get("/:id", async (c) => {
   return c.json(result);
 });
 
-studentsRouter.post(
+route.post(
   "/",
   zValidator(
     "json",
@@ -52,7 +52,7 @@ studentsRouter.post(
   }
 );
 
-studentsRouter.patch(
+route.patch(
   "/:id",
   zValidator(
     "json",
@@ -75,7 +75,7 @@ studentsRouter.patch(
   }
 );
 
-studentsRouter.delete("/:id", async (c) => {
+route.delete("/:id", async (c) => {
   const id = Number(c.req.param("id"));
   const deleted = await drizzle.delete(students).where(eq(students.id, id)).returning();
   if (deleted.length === 0) {
@@ -84,4 +84,4 @@ studentsRouter.delete("/:id", async (c) => {
   return c.json({ success: true, students: deleted[0] });
 });
 
-export default studentsRouter;
+export default route;
